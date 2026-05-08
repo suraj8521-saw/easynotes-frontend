@@ -81,7 +81,15 @@ const Profile = () => {
                 <p className="fs-5 fw-semibold text-dark border-bottom pb-2">{user?.email || "N/A"}</p>
               </div>
 
-              {/* Password Section Integrated Professionally */}
+              {/* Member Since - BACK IN ACTION */}
+              <div className="mb-4">
+                <label className="small text-muted fw-bold text-uppercase">Member Since</label>
+                <p className="text-secondary border-bottom pb-2">
+                  {user?.joined_at ? new Date(user.joined_at).toLocaleDateString('en-IN', { month: 'long', year: 'numeric', day: 'numeric' }) : "Recently Synchronized"}
+                </p>
+              </div>
+
+              {/* Password Section */}
               <div className="mt-5 border rounded-4 p-3 bg-light">
                 <div className="d-flex justify-content-between align-items-center">
                   <h6 className="fw-bold mb-0 text-dark">Security Protocol</h6>
@@ -127,7 +135,7 @@ const Profile = () => {
                   className="btn btn-outline-dark fw-bold rounded-pill py-2"
                   onClick={() => navigate("/all-notes")}
                 >
-                  Return to Vault
+                  View Notes
                 </button>
                 <button 
                   className="btn btn-danger fw-bold rounded-pill py-2 opacity-75"
