@@ -112,10 +112,11 @@ const Profile = () => {
               </div>
               
              {/* Member Since Section */}
+{/* Profile.jsx mein Member Since wala part replace karo */}
 <div className="mb-4">
   <label className="small text-muted fw-bold text-uppercase">Member Since</label>
   <p className="text-secondary border-bottom pb-2">
-    {/* Ye line har tarah ki date key ko check karegi jo backend se aa sakti hai */}
+    {/* Ye line check karegi backend se kya aa raha hai */}
     {user?.joined_at || user?.created_at || user?.timestamp ? (
       new Date(user.joined_at || user.created_at || user.timestamp).toLocaleDateString('en-IN', { 
         day: 'numeric', 
@@ -123,7 +124,7 @@ const Profile = () => {
         year: 'numeric' 
       })
     ) : (
-      "8 May 2026"  // Agar kuch bhi na mile toh fallback
+      "8 May 2026"  // Agar database mein date hai hi nahi, toh ye fallback dikhega
     )}
   </p>
 </div>
