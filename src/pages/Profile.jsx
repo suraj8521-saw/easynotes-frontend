@@ -18,10 +18,20 @@ const Profile = () => {
         const res = await API.get("/auth/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setUser(res.data);
+
+        // Backend response se data nikaalo
+        const userData = res.data;
+        setUser(userData);
+
+        // Sabse important: Local Storage ko sync karo naye user ke naam ke saath
+        // Ye ensures karega ki Navbar aur Profile dono jagah real name dikhe
+        const realName = userData.name || userData.full_name || userData.username || "User";
+        localStorage.setItem("user_name", realName);
+
       } catch (err) {
         console.error("Profile Synchronization Error:", err);
-        alert("Unable to retrieve account specifications. Please re-authenticate.");
+        // Professional Alert
+        alert("Unable to synchronize account specifications. Please re-authenticate.");
         navigate("/login");
       } finally {
         setLoading(false);
@@ -60,28 +70,28 @@ const Profile = () => {
       <div className="row justify-content-center">
         <div className="col-md-6">
           <div className="card border-0 shadow-lg rounded-4 overflow-hidden">
-            {/* Profile Header Decoration */}
+            {/* Dynamic Profile Header */}
             <div className="bg-success py-5 text-center text-white">
               <div className="bg-white text-success rounded-circle d-inline-flex align-items-center justify-content-center fw-bold shadow" 
                    style={{ width: "80px", height: "80px", fontSize: "2rem" }}>
+                {/* Yahan first letter dynamic ho gaya */}
                 {user?.name ? user.name[0].toUpperCase() : "U"}
               </div>
-              <h4 className="mt-3 fw-bold mb-0">Account Specifications</h4>
+              <h4 className="mt-3 fw-bold mb-0">{user?.name || "Account Profile"}</h4>
               <p className="small opacity-75 text-white">Verified Secure Profile</p>
             </div>
 
             <div className="card-body p-4 p-lg-5 bg-white">
               <div className="mb-4">
                 <label className="small text-muted fw-bold text-uppercase">Full Name</label>
-                <p className="fs-5 fw-semibold text-dark border-bottom pb-2">{user?.name || "N/A"}</p>
+                <p className="fs-5 fw-semibold text-dark border-bottom pb-2">{user?.name || "Access Denied"}</p>
               </div>
 
               <div className="mb-4">
                 <label className="small text-muted fw-bold text-uppercase">Email Address</label>
-                <p className="fs-5 fw-semibold text-dark border-bottom pb-2">{user?.email || "N/A"}</p>
+                <p className="fs-5 fw-semibold text-dark border-bottom pb-2">{user?.email || "Access Denied"}</p>
               </div>
 
-              {/* Member Since - BACK IN ACTION */}
               <div className="mb-4">
                 <label className="small text-muted fw-bold text-uppercase">Member Since</label>
                 <p className="text-secondary border-bottom pb-2">
