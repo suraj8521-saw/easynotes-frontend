@@ -1,120 +1,95 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import API from "../api";
 import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
   const [user, setUser] = useState(null);
-  const [showPassForm, setShowPassForm] = useState(false);
-  const [passData, setPassData] = useState({ old_password: "", new_password: "" });
-  const [loading, setLoading] = useState(false);
-  
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
-  // --- User Details Fetch Karo ---
   useEffect(() => {
-    if (!token) {
-      navigate("/login");
-      return;
-    }
-    axios.get("http://127.0.0.1:8000/auth/me", {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-    .then(res => setUser(res.data))
-    .catch(() => navigate("/login"));
+    const fetchProfileData = async () => {
+      try {
+        const res = await API.get("/auth/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUser(res.data);
+      } catch (err) {
+        console.error("Profile Synchronization Error:", err);
+        alert("Unable to retrieve account specifications. Please re-authenticate.");
+        navigate("/login");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (token) fetchProfileData();
+    else navigate("/login");
   }, [token, navigate]);
 
-  // --- Password Change Logic ---
-  const handlePasswordUpdate = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const res = await axios.put("http://127.0.0.1:8000/auth/change-password", passData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      alert(res.data.message);
-      setPassData({ old_password: "", new_password: "" }); // Form clear karo
-      setShowPassForm(false); // Form band karo
-    } catch (err) {
-      alert(err.response?.data?.detail || "Update fail ho gaya, bhai!");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (!user) return <div className="text-center mt-5"><h4>Bhai, details nikal raha hoon...</h4></div>;
+  if (loading) return (
+    <div className="d-flex justify-content-center align-items-center vh-100">
+      <div className="spinner-border text-success" role="status"></div>
+    </div>
+  );
 
   return (
     <div className="container mt-5">
       <div className="row justify-content-center">
-        <div className="col-md-5">
+        <div className="col-md-6">
           <div className="card border-0 shadow-lg rounded-4 overflow-hidden">
-            {/* Header Section */}
-            <div className="bg-success py-5 text-center">
-              <div className="bg-white text-success rounded-circle d-inline-flex align-items-center justify-content-center fw-bold shadow" style={{ width: '100px', height: '100px', fontSize: '3rem' }}>
-                {user.name[0].toUpperCase()}
+            {/* Profile Header Decoration */}
+            <div className="bg-success py-5 text-center text-white">
+              <div className="bg-white text-success rounded-circle d-inline-flex align-items-center justify-content-center fw-bold shadow" 
+                   style={{ width: "80px", height: "80px", fontSize: "2rem" }}>
+                {user?.name ? user.name[0].toUpperCase() : "U"}
               </div>
+              <h4 className="mt-3 fw-bold mb-0">Account Specifications</h4>
+              <p className="small opacity-75 text-white">Verified Secure Profile</p>
             </div>
 
-            {/* Profile Info */}
-            <div className="card-body p-4 text-center">
-              <h3 className="fw-bold mb-1">{user.name}</h3>
-              <p className="text-muted mb-4">{user.email}</p>
-              
-              <div className="text-start bg-light p-3 rounded-3 mb-4 border">
-                <div className="d-flex justify-content-between mb-2">
-                  <span className="text-muted small">Status</span>
-                  <span className="fw-bold text-success small">Verified ✅</span>
-                </div>
-                <div className="d-flex justify-content-between">
-                  <span className="text-muted small">Joined</span>
-                  <span className="fw-bold small">{new Date(user.joined_at).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })}</span>
-                </div>
+            <div className="card-body p-4 p-lg-5 bg-white">
+              <div className="mb-4">
+                <label className="small text-muted fw-bold text-uppercase">Full Name</label>
+                <p className="fs-5 fw-semibold text-dark border-bottom pb-2">{user?.name || "N/A"}</p>
               </div>
 
-              {/* Toggle Change Password Section */}
-              <div className="mb-3">
+              <div className="mb-4">
+                <label className="small text-muted fw-bold text-uppercase">Email Address</label>
+                <p className="fs-5 fw-semibold text-dark border-bottom pb-2">{user?.email || "N/A"}</p>
+              </div>
+
+              <div className="mb-4">
+                <label className="small text-muted fw-bold text-uppercase">Member Since</label>
+                <p className="text-secondary border-bottom pb-2">
+                  {user?.joined_at ? new Date(user.joined_at).toLocaleDateString('en-IN', { month: 'long', year: 'numeric', day: 'numeric' }) : "Recently Synchronized"}
+                </p>
+              </div>
+
+              <div className="d-grid gap-3 mt-5">
                 <button 
-                  className={`btn btn-sm w-100 fw-bold rounded-pill ${showPassForm ? 'btn-light text-danger' : 'btn-outline-danger'}`}
-                  onClick={() => setShowPassForm(!showPassForm)}
+                  className="btn btn-outline-dark fw-bold rounded-pill py-2"
+                  onClick={() => navigate("/all-notes")}
                 >
-                  {showPassForm ? "✖ Cancel Update" : "🔐 Change Password"}
+                  Return to Vault
+                </button>
+                <button 
+                  className="btn btn-danger fw-bold rounded-pill py-2 opacity-75"
+                  onClick={() => {
+                    localStorage.clear();
+                    window.location.href = "/login";
+                  }}
+                >
+                  Terminate Session
                 </button>
               </div>
-
-              {showPassForm && (
-                <form onSubmit={handlePasswordUpdate} className="text-start bg-white p-3 rounded-3 border shadow-sm mb-4">
-                  <div className="mb-2">
-                    <label className="small fw-bold text-muted">Old Password</label>
-                    <input 
-                      type="password" 
-                      className="form-control form-control-sm border-0 bg-light" 
-                      required 
-                      value={passData.old_password}
-                      onChange={(e) => setPassData({...passData, old_password: e.target.value})}
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label className="small fw-bold text-muted">New Password</label>
-                    <input 
-                      type="password" 
-                      className="form-control form-control-sm border-0 bg-light" 
-                      required 
-                      value={passData.new_password}
-                      onChange={(e) => setPassData({...passData, new_password: e.target.value})}
-                    />
-                  </div>
-                  <button type="submit" className="btn btn-success btn-sm w-100 fw-bold" disabled={loading}>
-                    {loading ? "Updating..." : "Save New Password"}
-                  </button>
-                </form>
-              )}
-
-              <button className="btn btn-outline-success w-100 fw-bold rounded-pill" onClick={() => navigate("/all-notes")}>
-                View My Notes
-              </button>
             </div>
           </div>
+          
+          <p className="text-center text-muted mt-4 small">
+            End-to-End Encrypted Session • EasyNotes v1.0
+          </p>
         </div>
       </div>
     </div>
