@@ -1,0 +1,46 @@
+/* src/index.css */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
+.transition-all { transition: all 0.3s ease; }
+.hover-scale:hover { transform: scale(1.05); transition: 0.2s; }
+.bg-success-subtle { background-color: #e8f5e9; } /* Light green for active link */
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: #f8fafc; /* Very light subtle grey */
+  color: #1e293b;
+}
+
+/* Smooth Transitions for everything */
+* {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Modern Card Hover Effect */
+.transition-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+  background: #28a745;
+  border-radius: 10px;
+}
+/* Navbar ko hamesha upar rakhne ke liye */
+.navbar {
+  position: sticky !important; /* Mobile par upar chipka rahega */
+  top: 0;
+  z-index: 1050 !important; 
+  background-color: white; /* Ya jo bhi aapka color hai */
+}
+
+/* Login card ya kisi bhi page content ko niche rakhne ke liye */
+.container, .card {
+  position: relative;
+  z-index: 1;
+}
