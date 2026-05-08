@@ -20,7 +20,7 @@ const CreateNote = () => {
 
     // Agar token nahi hai toh login pe bhej do
     if (!token) {
-      alert("Bhai, pehle login toh kar lo!");
+      alert("Please login First!");
       navigate("/login");
       return;
     }
@@ -45,12 +45,12 @@ const CreateNote = () => {
 
     } catch (error) {
       if (error.response?.status === 401) {
-        alert("Bhai, session khatam ho gaya. Fir se login karo.");
+        alert("Session Expired , Login First.");
         localStorage.removeItem("token");
         navigate('/login');
       } else {
         console.error("Save Note Error:", error.response?.data || error.message);
-        alert(error.response?.data?.detail || "Backend error! Check karo server live hai ya nahi.");
+        alert(error.response?.data?.detail || "Something Went Wrong , Please Try Again.");
       }
     } finally {
       setLoading(false); 
