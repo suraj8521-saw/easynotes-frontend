@@ -113,19 +113,31 @@ const Profile = () => {
               
              {/* Member Since Section */}
 {/* Profile.jsx mein Member Since wala part replace karo */}
+{/* Profile.jsx mein Member Since wala part replace karo */}
 <div className="mb-4">
   <label className="small text-muted fw-bold text-uppercase">Member Since</label>
   <p className="text-secondary border-bottom pb-2">
-    {/* Ye line check karegi backend se kya aa raha hai */}
-    {user?.joined_at || user?.created_at || user?.timestamp ? (
-      new Date(user.joined_at || user.created_at || user.timestamp).toLocaleDateString('en-IN', { 
-        day: 'numeric', 
-        month: 'long', 
-        year: 'numeric' 
-      })
-    ) : (
-      "8 May 2026"  // Agar database mein date hai hi nahi, toh ye fallback dikhega
-    )}
+    {(() => {
+      // 1. Teeno me se koi bhi date key uthao
+      const rawDate = user?.joined_at || user?.created_at || user?.timestamp;
+      
+      // 2. Agar date mil gayi hai
+      if (rawDate && rawDate !== "Recently") {
+        const parsedDate = new Date(rawDate);
+        
+        // 3. Check karo ki kya Date valid hai
+        if (!isNaN(parsedDate.getTime())) {
+          return parsedDate.toLocaleDateString('en-IN', { 
+            day: 'numeric', 
+            month: 'long', 
+            year: 'numeric' 
+          });
+        }
+      }
+      
+      // 4. Fallback: Agar upar sab fail ho jaye
+      return "8 May 2026"; 
+    })()}
   </p>
 </div>
               {/* Password Section */}
