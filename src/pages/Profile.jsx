@@ -110,21 +110,13 @@ const Profile = () => {
                   {user?.email || "Access Denied"}
                 </p>
               </div>
-              // Profile.jsx ke andar Member Since wala part:
-              <div className="mb-4">
-                <label className="small text-muted fw-bold text-uppercase">
-                  Member Since
-                </label>
+              
+             <div className="mb-4">
+                <label className="small text-muted fw-bold text-uppercase">Member Since</label>
                 <p className="text-secondary border-bottom pb-2">
-                  {/* Agar joined_at nahi mila toh created_at check karega, dono nahi mile toh fallback dikhayega */}
-                  {(user?.joined_at || user?.created_at) &&
-                  user?.joined_at !== "Recently"
-                    ? new Date(
-                        user.joined_at || user.created_at,
-                      ).toLocaleDateString("en-IN", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
+                  {user?.joined_at && user.joined_at !== "Recently"
+                    ? new Date(user.joined_at).toLocaleDateString('en-IN', { 
+                        day: 'numeric', month: 'long', year: 'numeric' 
                       })
                     : "Access Verified"}
                 </p>
