@@ -1,49 +1,60 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
-import axios from "axios";
+import API from "../api"; // Custom axios instance use karna better hai
 
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const token = localStorage.getItem("token");
 
+  // Initializing User State with fallback
   const [userName, setUserName] = useState(() => {
     const saved = localStorage.getItem("user_name");
     return (saved && saved !== "undefined" && saved !== "User") ? saved : "Suraj";
   });
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const synchronizeUserProfile = async () => {
       if (token) {
         try {
-          const res = await axios.get("https://unsterile-molar-risotto.ngrok-free.dev/auth/me", {
+          // Live Render API call
+          const res = await API.get("/auth/me", {
             headers: { Authorization: `Bearer ${token}` }
           });
 
-          let finalName = res.data.name || res.data.full_name || "Suraj";
+          const finalName = res.data.name || "Suraj";
           setUserName(finalName);
           localStorage.setItem("user_name", finalName);
         } catch (err) {
-          if (err.response?.status === 401) handleLogout();
+          if (err.response?.status === 401) {
+            console.warn("Session authentication failed. Initiating logout.");
+            handleLogout();
+          }
         }
       }
     };
-    fetchUser();
+    synchronizeUserProfile();
   }, [token]);
 
   const handleLogout = () => {
     localStorage.clear();
+    // Use professional notification instead of basic alert
+    console.log("User session terminated successfully.");
     window.location.href = "/login";
   };
 
   const isActive = (path) => location.pathname === path;
-  const displayName = userName.split(" ")[0];
+  
+  // Extracting first name for a professional greeting
+  const displayName = userName ? userName.split(" ")[0] : "User";
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom" 
+    <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm" 
          style={{ position: 'sticky', top: 0, zIndex: 1100, width: '100%' }}>
       <div className="container-fluid px-lg-5">
-        <Link className="navbar-brand fw-bold text-success fs-3" to="/">EasyNotes.</Link>
+        <Link className="navbar-brand fw-bold text-success fs-3" style={{ letterSpacing: "-1px" }} to="/">
+          EasyNotes<span className="text-dark">.</span>
+        </Link>
 
         <button className="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
           <span className="navbar-toggler-icon"></span>
@@ -53,50 +64,53 @@ const Navbar = () => {
           <ul className="navbar-nav ms-auto align-items-center gap-2 gap-lg-3 py-3 py-lg-0">
             {token ? (
               <>
-                {/* 1. New Note Link (Added Here) */}
-                <li className="nav-item w-100 text-center text-lg-start">
+                <li className="nav-item">
                   <Link 
-                    className={`nav-link fw-bold px-3 rounded-pill ${isActive('/create-note') ? 'text-success bg-success-subtle' : 'text-secondary'}`} 
+                    className={`nav-link fw-bold px-3 rounded-pill transition-all ${isActive('/create-note') ? 'text-success bg-light' : 'text-secondary'}`} 
                     to="/create-note"
                   >
-                    + New Note
+                    + New Entry
                   </Link>
                 </li>
 
-                {/* 2. My Vault Link */}
-                <li className="nav-item w-100 text-center text-lg-start">
+                <li className="nav-item">
                   <Link 
-                    className={`nav-link fw-bold px-3 rounded-pill ${isActive('/all-notes') ? 'text-success bg-success-subtle' : 'text-secondary'}`} 
+                    className={`nav-link fw-bold px-3 rounded-pill transition-all ${isActive('/all-notes') ? 'text-success bg-light' : 'text-secondary'}`} 
                     to="/all-notes"
                   >
-                    View Notes
+                    View Archives
                   </Link>
                 </li>
                 
-                {/* 3. Profile Section */}
-                <li className="nav-item">
+                {/* Profile Link with improved UX */}
+                <li className="nav-item ms-lg-2">
                   <div 
                     onClick={() => navigate("/profile")}
-                    className="d-flex align-items-center bg-light border rounded-pill p-1 pe-3 shadow-sm"
-                    style={{ cursor: 'pointer', minWidth: 'max-content' }}
+                    className="d-flex align-items-center bg-white border rounded-pill p-1 pe-3 shadow-sm hover-effect"
+                    style={{ cursor: 'pointer', transition: '0.3s' }}
                   >
-                    <div className="bg-success text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style={{ width: "35px", height: "35px" }}>
+                    <div className="bg-dark text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" 
+                         style={{ width: "32px", height: "32px", fontSize: '0.8rem' }}>
                       {displayName[0].toUpperCase()}
                     </div>
-                    <span className="ms-2 small fw-bold text-dark">Hello, {displayName}</span>
+                    <span className="ms-2 small fw-bold text-dark">Account: {displayName}</span>
                   </div>
                 </li>
                 
-                {/* 4. Sign Out */}
                 <li className="nav-item">
-                  <button className="btn btn-link text-danger text-decoration-none fw-bold small" onClick={handleLogout}>
+                  <button 
+                    className="btn btn-link text-danger text-decoration-none fw-bold small" 
+                    onClick={() => {
+                      if(window.confirm("Are you sure you want to terminate your session?")) handleLogout();
+                    }}
+                  >
                     Sign Out
                   </button>
                 </li>
               </>
             ) : (
               <li className="nav-item">
-                <Link className="btn btn-success rounded-pill px-4 fw-bold" to="/login">Login</Link>
+                <Link className="btn btn-success rounded-pill px-4 fw-bold shadow-sm" to="/login">Access Account</Link>
               </li>
             )}
           </ul>
