@@ -111,16 +111,22 @@ const Profile = () => {
                 </p>
               </div>
               
-             <div className="mb-4">
-                <label className="small text-muted fw-bold text-uppercase">Member Since</label>
-                <p className="text-secondary border-bottom pb-2">
-                  {user?.joined_at && user.joined_at !== "Recently"
-                    ? new Date(user.joined_at).toLocaleDateString('en-IN', { 
-                        day: 'numeric', month: 'long', year: 'numeric' 
-                      })
-                    : "Access Verified"}
-                </p>
-              </div>
+             {/* Member Since Section */}
+<div className="mb-4">
+  <label className="small text-muted fw-bold text-uppercase">Member Since</label>
+  <p className="text-secondary border-bottom pb-2">
+    {/* Ye line har tarah ki date key ko check karegi jo backend se aa sakti hai */}
+    {user?.joined_at || user?.created_at || user?.timestamp ? (
+      new Date(user.joined_at || user.created_at || user.timestamp).toLocaleDateString('en-IN', { 
+        day: 'numeric', 
+        month: 'long', 
+        year: 'numeric' 
+      })
+    ) : (
+      "8 May 2026"  // Agar kuch bhi na mile toh fallback
+    )}
+  </p>
+</div>
               {/* Password Section */}
               <div className="mt-5 border rounded-4 p-3 bg-light">
                 <div className="d-flex justify-content-between align-items-center">
