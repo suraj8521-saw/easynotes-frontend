@@ -83,7 +83,7 @@ const CreateNote = () => {
                 <textarea
                   name="content"
                   className="form-control py-2 shadow-sm border-0 bg-light"
-                  placeholder="What's on your mind, Suraj?"
+                  placeholder="What's on your mind?"
                   rows="6"
                   value={note.content}
                   onChange={handleChange}
